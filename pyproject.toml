@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "knowledge-rag"
+version = "0.1.0"
+description = "Local RAG system as MCP server for Claude Code"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "chromadb==1.5.0",
+    "fastmcp<3",
+    "pydantic>=2.12.5",
+    "python-frontmatter>=1.1.0",
+    "rank-bm25>=0.2.2",
+    "requests>=2.31.0",
+    "watchdog>=4.0",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "ollama: tests requiring Ollama with nomic-embed-text (deselect with '-m not ollama')",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]

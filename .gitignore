@@ -1,0 +1,44 @@
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# RAG data directory (per-project, generated at runtime)
+.rag/
+
+# Windows artifacts
+NUL
+
+# Acceptance test cache (cloned repos)
+.acceptance-cache/
+
+# Internal planning docs (not for distribution)
+.planning/
+
+# Test artifacts
+_seg_test/
+.pytest_cache/
+
+# Claude Code project settings (personal paths)
+.claude/
+
+# Old git history backup
+.git.bak/

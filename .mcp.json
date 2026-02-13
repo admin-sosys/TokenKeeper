@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "knowledge-rag": {
+      "command": "/path/to/TokenKeeper/.venv/bin/python",
+      "args": ["-m", "knowledge_rag"],
+      "env": {
+        "KNOWLEDGE_RAG_PROJECT": "${workspaceFolder}"
+      }
+    }
+  }
+}
