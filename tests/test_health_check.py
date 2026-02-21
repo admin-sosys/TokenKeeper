@@ -76,6 +76,7 @@ class TestPythonVersionCheck:
 class TestPlatformCheck:
     """Tests for check_windows_platform()."""
 
+    @pytest.mark.skipif(sys.platform != "win32", reason="Windows-only test")
     def test_platform_check_returns_healthy_on_windows(self) -> None:
         """check_windows_platform() returns healthy=True on Windows."""
         result = check_windows_platform()
@@ -84,10 +85,18 @@ class TestPlatformCheck:
         assert result.name == "Platform"
         assert "Windows" in result.detail
 
+    @pytest.mark.skipif(sys.platform != "win32", reason="Windows-only test")
     def test_platform_check_detail_says_native(self) -> None:
         """On native Windows the detail includes '(native)'."""
         result = check_windows_platform()
         assert "native" in result.detail
+
+    @pytest.mark.skipif(sys.platform == "win32", reason="Non-Windows test")
+    def test_platform_check_returns_unhealthy_on_non_windows(self) -> None:
+        """check_windows_platform() returns healthy=False on non-Windows."""
+        result = check_windows_platform()
+        assert isinstance(result, HealthStatus)
+        assert result.healthy is False
 
 
 # ---------------------------------------------------------------------------
