@@ -36,6 +36,9 @@ NUL
 # Test artifacts
 _seg_test/
 .pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
 
 # Claude Code project settings (personal paths)
 .claude/
