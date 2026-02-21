@@ -5,8 +5,36 @@ build-backend = "hatchling.build"
 [project]
 name = "knowledge-rag"
 version = "0.1.0"
-description = "Local RAG system as MCP server for Claude Code"
-requires-python = ">=3.12,<3.13"
+description = "Local RAG memory for Claude Code -- reduce prompt tokens by 80%"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10,<3.14"
+authors = [
+    {name = "Matt M", email = "admin@sosys.dev"},
+]
+keywords = [
+    "mcp",
+    "rag",
+    "claude-code",
+    "embeddings",
+    "semantic-search",
+    "token-optimization",
+    "chromadb",
+    "ollama",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Text Processing :: Indexing",
+    "Typing :: Typed",
+]
 dependencies = [
     "chromadb==1.5.0",
     "fastmcp<3",
@@ -17,6 +45,15 @@ dependencies = [
     "watchdog>=4.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/admin-sosys/TokenKeeper"
+Repository = "https://github.com/admin-sosys/TokenKeeper"
+Issues = "https://github.com/admin-sosys/TokenKeeper/issues"
+Changelog = "https://github.com/admin-sosys/TokenKeeper/blob/master/CHANGELOG.md"
+
+[project.scripts]
+knowledge-rag = "knowledge_rag.__main__:main"
+
 [tool.pytest.ini_options]
 markers = [
     "ollama: tests requiring Ollama with nomic-embed-text (deselect with '-m not ollama')",
@@ -25,4 +62,5 @@ markers = [
 [dependency-groups]
 dev = [
     "pytest>=8.0.0",
+    "pytest-cov>=6.0.0",
 ]
