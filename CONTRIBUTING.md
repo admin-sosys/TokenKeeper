@@ -53,6 +53,14 @@ uv run pytest tests/ -m "not ollama" --cov=src/tokenkeeper --cov-report=term-mis
 - **Pydantic** models are used for configuration and data validation. Use them for new config or structured data types.
 - Keep functions focused and small. Prefer composition over inheritance.
 
+## Security
+
+**Never commit secrets, tokens, API keys, or credentials.** This repository has GitHub secret scanning and push protection enabled — pushes containing detected secrets will be blocked automatically.
+
+- Store all secrets in `.env` (which is gitignored)
+- Use `${{ secrets.NAME }}` for GitHub Actions workflows
+- If you accidentally commit a secret, revoke it immediately and notify the maintainers
+
 ## Pull Request Process
 
 1. **Fork** the repository and create a feature branch from `master`.
