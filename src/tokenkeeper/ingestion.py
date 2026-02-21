@@ -1,4 +1,4 @@
-"""Document ingestion pipeline for Knowledge RAG.
+"""Document ingestion pipeline for TokenKeeper.
 
 Provides the ``DocumentChunk`` data model, ``HeadingStack`` heading hierarchy
 tracker, YAML frontmatter extraction via ``python-frontmatter``, whitespace
@@ -28,7 +28,7 @@ from pathlib import Path
 
 import frontmatter
 
-logger = logging.getLogger("knowledge_rag.ingestion")
+logger = logging.getLogger("tokenkeeper.ingestion")
 
 # ---------------------------------------------------------------------------
 # Compiled regexes (module-level for performance)

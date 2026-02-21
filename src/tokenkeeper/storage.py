@@ -1,4 +1,4 @@
-"""ChromaDB storage module for Knowledge RAG.
+"""ChromaDB storage module for TokenKeeper.
 
 Provides persistent vector storage using ChromaDB, including client/collection
 management, chunk ID generation with POSIX path normalisation, file-level
@@ -25,9 +25,9 @@ from pathlib import Path, PurePosixPath
 
 import chromadb
 
-from knowledge_rag.ingestion import DocumentChunk
+from tokenkeeper.ingestion import DocumentChunk
 
-logger = logging.getLogger("knowledge_rag.storage")
+logger = logging.getLogger("tokenkeeper.storage")
 
 
 # ---------------------------------------------------------------------------

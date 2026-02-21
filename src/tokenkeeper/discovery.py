@@ -1,4 +1,4 @@
-"""File discovery for Knowledge RAG.
+"""File discovery for TokenKeeper.
 
 Walks project directories to find files by extension, handles glob expansion,
 exclusion pruning, and deduplication.
@@ -17,9 +17,9 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from knowledge_rag.config import RagConfig
+from tokenkeeper.config import RagConfig
 
-logger = logging.getLogger("knowledge_rag.discovery")
+logger = logging.getLogger("tokenkeeper.discovery")
 
 # ---------------------------------------------------------------------------
 # Constants

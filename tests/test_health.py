@@ -1,4 +1,4 @@
-"""Unit tests for knowledge_rag.health startup checks.
+"""Unit tests for tokenkeeper.health startup checks.
 
 All HTTP calls are mocked so tests run without Ollama or ChromaDB
 services. ChromaDB accessibility is tested with a skip marker when
@@ -12,13 +12,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests as _requests
 
-from knowledge_rag.health import (
+from tokenkeeper.health import (
     check_chromadb_accessible,
     check_embedding_model,
     check_ollama_running,
     run_startup_checks,
 )
-from knowledge_rag.types import MODEL_NAME, OLLAMA_REQUEST_TIMEOUT, OLLAMA_TAGS_URL
+from tokenkeeper.types import MODEL_NAME, OLLAMA_REQUEST_TIMEOUT, OLLAMA_TAGS_URL
 
 
 # ---------------------------------------------------------------------------
@@ -151,9 +151,9 @@ class TestCheckChromadbAccessible:
 class TestRunStartupChecks:
     """Tests for run_startup_checks()."""
 
-    @patch("knowledge_rag.health.check_chromadb_accessible")
-    @patch("knowledge_rag.health.check_embedding_model")
-    @patch("knowledge_rag.health.check_ollama_running")
+    @patch("tokenkeeper.health.check_chromadb_accessible")
+    @patch("tokenkeeper.health.check_embedding_model")
+    @patch("tokenkeeper.health.check_ollama_running")
     def test_all_pass(
         self,
         mock_ollama: MagicMock,
@@ -161,7 +161,7 @@ class TestRunStartupChecks:
         mock_chroma: MagicMock,
     ) -> None:
         """All checks passing does not raise SystemExit."""
-        from knowledge_rag.types import HealthStatus
+        from tokenkeeper.types import HealthStatus
 
         mock_ollama.return_value = HealthStatus("Ollama", True, "ok", "")
         mock_model.return_value = HealthStatus("Model", True, "ok", "")
@@ -170,9 +170,9 @@ class TestRunStartupChecks:
         # Should not raise
         run_startup_checks()
 
-    @patch("knowledge_rag.health.check_chromadb_accessible")
-    @patch("knowledge_rag.health.check_embedding_model")
-    @patch("knowledge_rag.health.check_ollama_running")
+    @patch("tokenkeeper.health.check_chromadb_accessible")
+    @patch("tokenkeeper.health.check_embedding_model")
+    @patch("tokenkeeper.health.check_ollama_running")
     def test_one_fails_raises_systemexit(
         self,
         mock_ollama: MagicMock,
@@ -181,7 +181,7 @@ class TestRunStartupChecks:
         capsys: pytest.CaptureFixture[str],
     ) -> None:
         """One failing check raises SystemExit(1) with stderr output."""
-        from knowledge_rag.types import HealthStatus
+        from tokenkeeper.types import HealthStatus
 
         mock_ollama.return_value = HealthStatus(
             "Ollama", False, "Not running", "run ollama serve",

@@ -1,4 +1,4 @@
-"""Search engine for Knowledge RAG.
+"""Search engine for TokenKeeper.
 
 Provides the hybrid search pipeline combining ChromaDB semantic search with
 BM25 keyword search via Reciprocal Rank Fusion (RRF).
@@ -22,9 +22,9 @@ from typing import Callable
 
 import chromadb
 
-from knowledge_rag.bm25_index import BM25Index
+from tokenkeeper.bm25_index import BM25Index
 
-logger = logging.getLogger("knowledge_rag.search")
+logger = logging.getLogger("tokenkeeper.search")
 
 
 # ---------------------------------------------------------------------------

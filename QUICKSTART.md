@@ -20,11 +20,11 @@ Create this file at the root of whatever project you want to index:
 ```json
 {
   "mcpServers": {
-    "knowledge-rag": {
+    "tokenkeeper": {
       "command": "/path/to/TokenKeeper/.venv/bin/python",
-      "args": ["-m", "knowledge_rag"],
+      "args": ["-m", "tokenkeeper"],
       "env": {
-        "KNOWLEDGE_RAG_PROJECT": "${workspaceFolder}"
+        "TOKENKEEPER_PROJECT": "${workspaceFolder}"
       }
     }
   }

@@ -17,8 +17,8 @@ from pathlib import Path
 import chromadb
 import pytest
 
-from knowledge_rag.bm25_index import BM25Index
-from knowledge_rag.search import (
+from tokenkeeper.bm25_index import BM25Index
+from tokenkeeper.search import (
     SearchResult,
     enrich_results,
     hybrid_search,

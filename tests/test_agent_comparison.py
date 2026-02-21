@@ -38,11 +38,11 @@ from typing import Any
 import chromadb
 import pytest
 
-from knowledge_rag.bm25_index import BM25Index
-from knowledge_rag.config import RagConfig
-from knowledge_rag.embeddings import embed_texts_google
-from knowledge_rag.indexer import index_documents
-from knowledge_rag.search import SearchResult, search
+from tokenkeeper.bm25_index import BM25Index
+from tokenkeeper.config import RagConfig
+from tokenkeeper.embeddings import embed_texts_google
+from tokenkeeper.indexer import index_documents
+from tokenkeeper.search import SearchResult, search
 
 # ---------------------------------------------------------------------------
 # Constants

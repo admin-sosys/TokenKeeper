@@ -17,8 +17,8 @@ body:
       label: Steps to Reproduce
       description: How can we reproduce this?
       placeholder: |
-        1. Install knowledge-rag
-        2. Run `knowledge-rag`
+        1. Install tokenkeeper
+        2. Run `tokenkeeper`
         3. ...
     validations:
       required: true
@@ -61,10 +61,10 @@ body:
       required: true
 
   - type: input
-    id: knowledge-rag-version
+    id: tokenkeeper-version
     attributes:
-      label: knowledge-rag Version
-      description: Output of `pip show knowledge-rag | grep Version`
+      label: tokenkeeper Version
+      description: Output of `pip show tokenkeeper | grep Version`
       placeholder: "0.1.0"
     validations:
       required: true

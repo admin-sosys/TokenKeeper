@@ -1,4 +1,4 @@
-"""Configuration system for Knowledge RAG.
+"""Configuration system for TokenKeeper.
 
 Provides Pydantic models for `.rag-config.json`, JSONC comment stripping,
 config loading with sensible defaults, template auto-generation, and `.rag/`
@@ -22,7 +22,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-logger = logging.getLogger("knowledge_rag.config")
+logger = logging.getLogger("tokenkeeper.config")
 
 # ---------------------------------------------------------------------------
 # JSONC helper
@@ -167,7 +167,7 @@ def generate_config_template() -> str:
         A string containing valid JSONC (JSON with ``//`` comments).
     """
     return """\
-// Knowledge RAG configuration
+// TokenKeeper configuration
 // This file lives at .rag/.rag-config.json
 //
 // Recommended .gitignore pattern:

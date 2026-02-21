@@ -44,9 +44,9 @@ Claude Code agent --> search_knowledge("topic") --> Top-k relevant chunks
 
 ## Quick Start
 
-> **Package name**: TokenKeeper is the project brand name. The PyPI package is `knowledge-rag`:
+> **Package name**: TokenKeeper is the project brand name. The PyPI package is `tokenkeeper`:
 > ```bash
-> pip install knowledge-rag
+> pip install tokenkeeper
 > ```
 > Until published to PyPI, install from source with `uv sync`.
 
@@ -72,11 +72,11 @@ Create `.mcp.json` in your project root:
 ```json
 {
   "mcpServers": {
-    "knowledge-rag": {
+    "tokenkeeper": {
       "command": "/path/to/TokenKeeper/.venv/bin/python",
-      "args": ["-m", "knowledge_rag"],
+      "args": ["-m", "tokenkeeper"],
       "env": {
-        "KNOWLEDGE_RAG_PROJECT": "${workspaceFolder}"
+        "TOKENKEEPER_PROJECT": "${workspaceFolder}"
       }
     }
   }
@@ -154,7 +154,7 @@ TokenKeeper auto-creates `.rag/.rag-config.json` on first run:
 
 ```
 TokenKeeper/
-  src/knowledge_rag/
+  src/tokenkeeper/
     server.py          # FastMCP server + lifespan
     indexer.py         # Discovery -> ingestion -> embedding -> storage
     search.py          # Hybrid search with RRF fusion
@@ -221,7 +221,7 @@ uv run pytest tests/test_agent_comparison.py -v -s
 | "Ollama connection refused" | Run `ollama serve` to start the server |
 | "nomic-embed-text not found" | Run `ollama pull nomic-embed-text` |
 | Claude Code doesn't show RAG tools | Ensure `.mcp.json` is in project root, restart Claude Code |
-| 0 chunks indexed | Check `KNOWLEDGE_RAG_PROJECT` env var points to your project root |
+| 0 chunks indexed | Check `TOKENKEEPER_PROJECT` env var points to your project root |
 | Slow first index | Normal — subsequent starts load cached ChromaDB in ~5 seconds |
 | Search returns irrelevant results | Try `mode: "keyword"` or lower `alpha` to 0.3 |
 

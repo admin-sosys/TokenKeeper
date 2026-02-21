@@ -48,11 +48,11 @@ Create `.mcp.json` in your project root:
 ```json
 {
   "mcpServers": {
-    "knowledge-rag": {
+    "tokenkeeper": {
       "command": "/path/to/TokenKeeper/.venv/bin/python",
-      "args": ["-m", "knowledge_rag"],
+      "args": ["-m", "tokenkeeper"],
       "env": {
-        "KNOWLEDGE_RAG_PROJECT": "${workspaceFolder}"
+        "TOKENKEEPER_PROJECT": "${workspaceFolder}"
       }
     }
   }
@@ -63,7 +63,7 @@ Create `.mcp.json` in your project root:
 
 ### Option B: Global (All Projects)
 
-Add to `~/.claude/settings.json` under an `mcpServers` key. Same format as above. The `KNOWLEDGE_RAG_PROJECT` env var tells TokenKeeper which directory to index.
+Add to `~/.claude/settings.json` under an `mcpServers` key. Same format as above. The `TOKENKEEPER_PROJECT` env var tells TokenKeeper which directory to index.
 
 ### Google Gemini Embeddings (Optional)
 
@@ -71,7 +71,7 @@ If you prefer Google Gemini over local Ollama, add the API key to the env block:
 
 ```json
 "env": {
-  "KNOWLEDGE_RAG_PROJECT": "${workspaceFolder}",
+  "TOKENKEEPER_PROJECT": "${workspaceFolder}",
   "GOOGLE_API_KEY": "your-api-key-here"
 }
 ```
@@ -352,7 +352,7 @@ export GOOGLE_API_KEY=your-key
 ### "Index is empty" / "0 chunks"
 
 The indexer couldn't find files. Check:
-- `KNOWLEDGE_RAG_PROJECT` env var points to your project root
+- `TOKENKEEPER_PROJECT` env var points to your project root
 - `content_mode` in `.rag/.rag-config.json` matches your file types
 - Files aren't in `.gitignore`-excluded directories
 

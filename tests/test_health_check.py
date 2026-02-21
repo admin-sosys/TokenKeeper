@@ -267,6 +267,6 @@ class TestHealthCheckExitCode:
             f"stderr: {result.stderr}"
         )
         # Output should contain the health check header
-        assert "Knowledge RAG - Health Check" in result.stdout
+        assert "TokenKeeper - Health Check" in result.stdout
         # Output should contain PASS/FAIL indicators
         assert "[PASS]" in result.stdout or "[FAIL]" in result.stdout

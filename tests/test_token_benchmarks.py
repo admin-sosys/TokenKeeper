@@ -1,4 +1,4 @@
-"""Token-savings benchmark suite for Knowledge RAG.
+"""Token-savings benchmark suite for TokenKeeper.
 
 Quantifies the core value proposition: how many tokens are saved by
 retrieving only relevant chunks instead of sending the full corpus to the
@@ -39,11 +39,11 @@ from typing import Any, Callable
 import chromadb
 import pytest
 
-from knowledge_rag.bm25_index import BM25Index
-from knowledge_rag.config import RagConfig
-from knowledge_rag.discovery import discover_code_files, discover_markdown_files
-from knowledge_rag.indexer import index_documents
-from knowledge_rag.search import SearchResult, search
+from tokenkeeper.bm25_index import BM25Index
+from tokenkeeper.config import RagConfig
+from tokenkeeper.discovery import discover_code_files, discover_markdown_files
+from tokenkeeper.indexer import index_documents
+from tokenkeeper.search import SearchResult, search
 
 
 # ---------------------------------------------------------------------------
@@ -1225,7 +1225,7 @@ def real_embed_fn():
     """Return the real Ollama embedding function."""
     if not ollama_available:
         pytest.skip("Ollama with nomic-embed-text not available")
-    from knowledge_rag.embeddings import embed_texts
+    from tokenkeeper.embeddings import embed_texts
 
     return embed_texts
 

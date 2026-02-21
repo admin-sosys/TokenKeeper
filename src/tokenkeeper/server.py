@@ -1,4 +1,4 @@
-"""FastMCP server for Knowledge RAG.
+"""FastMCP server for TokenKeeper.
 
 Hosts the MCP server with a lifespan that:
   1. Runs health checks and embedding smoke test
@@ -53,7 +53,7 @@ def setup_logging(rag_dir: Path) -> None:
     Args:
         rag_dir: The ``.rag/`` directory where ``rag.log`` will be created.
     """
-    root_logger = logging.getLogger("knowledge_rag")
+    root_logger = logging.getLogger("tokenkeeper")
     root_logger.setLevel(logging.DEBUG)
 
     # Prevent duplicate handlers on repeated calls
@@ -89,7 +89,7 @@ def setup_logging(rag_dir: Path) -> None:
 # Lifespan
 # ---------------------------------------------------------------------------
 
-logger = logging.getLogger("knowledge_rag.server")
+logger = logging.getLogger("tokenkeeper.server")
 
 
 def _make_reindex_callback(
@@ -134,7 +134,7 @@ def _make_reindex_callback(
             indexing_state["status"] = "indexing"
             indexing_state["started_at"] = time.time()
             try:
-                from knowledge_rag.indexer import index_documents  # noqa: PLC0415
+                from tokenkeeper.indexer import index_documents  # noqa: PLC0415
 
                 result = await asyncio.to_thread(
                     index_documents,
@@ -162,7 +162,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
     """Server lifespan: health checks, indexing, and context setup.
 
     Runs in order:
-      1. Determine project root from ``KNOWLEDGE_RAG_PROJECT`` env var
+      1. Determine project root from ``TOKENKEEPER_PROJECT`` env var
          or ``Path.cwd()``.
       2. Ensure ``.rag/`` directory exists.
       3. Set up logging to ``.rag/rag.log`` + stderr.
@@ -179,33 +179,33 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
         embed_fn, and indexing_result keys.
     """
     # 1. Project root
-    project_root_env = os.environ.get("KNOWLEDGE_RAG_PROJECT")
+    project_root_env = os.environ.get("TOKENKEEPER_PROJECT")
     if project_root_env:
         project_root = Path(project_root_env)
     else:
         project_root = Path.cwd()
 
     # 2. Ensure .rag/ directory
-    from knowledge_rag.config import ensure_rag_directory  # noqa: PLC0415
+    from tokenkeeper.config import ensure_rag_directory  # noqa: PLC0415
 
     rag_dir = ensure_rag_directory(project_root)
 
     # 3. Logging
     setup_logging(rag_dir)
-    logger.info("Starting Knowledge RAG server (root=%s)", project_root)
+    logger.info("Starting TokenKeeper server (root=%s)", project_root)
 
     # 4. Health checks (lazy import)
-    from knowledge_rag.health import run_startup_checks  # noqa: PLC0415
+    from tokenkeeper.health import run_startup_checks  # noqa: PLC0415
 
     run_startup_checks()
 
     # 5. Smoke test (lazy import)
-    from knowledge_rag.embeddings import run_smoke_test  # noqa: PLC0415
+    from tokenkeeper.embeddings import run_smoke_test  # noqa: PLC0415
 
     run_smoke_test()
 
     # 6. Config
-    from knowledge_rag.config import load_config  # noqa: PLC0415
+    from tokenkeeper.config import load_config  # noqa: PLC0415
 
     config = load_config(project_root)
     logger.info(
@@ -217,7 +217,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
     )
 
     # 7. ChromaDB client and collection
-    from knowledge_rag.storage import (  # noqa: PLC0415
+    from tokenkeeper.storage import (  # noqa: PLC0415
         create_chroma_client,
         get_or_create_collection,
     )
@@ -228,18 +228,18 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
     logger.info("ChromaDB collection ready (%d documents)", collection.count())
 
     # 8. Build BM25 index from stored metadata
-    from knowledge_rag.bm25_index import BM25Index  # noqa: PLC0415
+    from tokenkeeper.bm25_index import BM25Index  # noqa: PLC0415
 
     bm25_index = BM25Index()
     _rebuild_bm25_from_metadata(collection, bm25_index)
 
     # 9. Embed function (lazy import)
-    from knowledge_rag.embeddings import embed_texts  # noqa: PLC0415
+    from tokenkeeper.embeddings import embed_texts  # noqa: PLC0415
 
     # 10. Run initial indexing as a background task (non-blocking)
     # The lifespan must yield quickly so the MCP server can respond to
     # the initialize handshake before Claude Code's startup timeout.
-    from knowledge_rag.indexer import IndexingResult, index_documents  # noqa: PLC0415
+    from tokenkeeper.indexer import IndexingResult, index_documents  # noqa: PLC0415
 
     # Mutable state for indexing status
     indexing_state: dict[str, Any] = {
@@ -278,8 +278,8 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
     # 11. Start file watcher (if enabled)
     watcher = None
     if getattr(config, "watch_enabled", False):
-        from knowledge_rag.discovery import EXCLUDED_DIRS  # noqa: PLC0415
-        from knowledge_rag.watcher import FileWatcher  # noqa: PLC0415
+        from tokenkeeper.discovery import EXCLUDED_DIRS  # noqa: PLC0415
+        from tokenkeeper.watcher import FileWatcher  # noqa: PLC0415
 
         # Determine watched extensions based on content_mode
         content_mode = getattr(config, "content_mode", "docs")
@@ -287,7 +287,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
         if content_mode in ("docs", "both"):
             watch_extensions.add(".md")
         if content_mode in ("code", "both"):
-            from knowledge_rag.discovery import CODE_EXTENSIONS  # noqa: PLC0415
+            from tokenkeeper.discovery import CODE_EXTENSIONS  # noqa: PLC0415
             watch_extensions.update(CODE_EXTENSIONS)
 
         loop = asyncio.get_event_loop()
@@ -331,7 +331,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
     if watcher:
         watcher.stop()
         logger.info("File watcher stopped")
-    logger.info("Knowledge RAG server shutting down")
+    logger.info("TokenKeeper server shutting down")
 
 
 def _rebuild_bm25_from_metadata(
@@ -370,7 +370,7 @@ def _rebuild_bm25_from_metadata(
 # Server instance
 # ---------------------------------------------------------------------------
 
-mcp = FastMCP("Knowledge RAG", lifespan=app_lifespan)
+mcp = FastMCP("TokenKeeper", lifespan=app_lifespan)
 
 
 # ---------------------------------------------------------------------------
@@ -443,7 +443,7 @@ async def search_knowledge(
     search_mode = mode if mode is not None else config.mode
 
     # Run search in thread to avoid blocking event loop
-    from knowledge_rag.search import search  # noqa: PLC0415
+    from tokenkeeper.search import search  # noqa: PLC0415
 
     def _do_search():
         return search(
@@ -509,7 +509,7 @@ async def indexing_status(ctx: Context) -> str:
     config = data.get("config")
 
     lines: list[str] = []
-    lines.append("=== Knowledge RAG Indexing Status ===\n")
+    lines.append("=== TokenKeeper Indexing Status ===\n")
 
     # Server info
     lines.append(f"Project root: {data.get('project_root', 'unknown')}")
@@ -607,7 +607,7 @@ async def reindex_documents(
     indexing_state["result"] = None
     indexing_state["error"] = None
 
-    from knowledge_rag.indexer import index_documents as _index_documents  # noqa: PLC0415
+    from tokenkeeper.indexer import index_documents as _index_documents  # noqa: PLC0415
 
     def _run_reindex():
         return _index_documents(
@@ -665,7 +665,7 @@ async def get_index_stats(ctx: Context) -> str:
     bm25_index = data.get("bm25_index")
     config = data.get("config")
 
-    lines: list[str] = ["=== Knowledge RAG Index Statistics ===\n"]
+    lines: list[str] = ["=== TokenKeeper Index Statistics ===\n"]
 
     # Project info
     lines.append(f"Project root: {data.get('project_root', 'unknown')}")

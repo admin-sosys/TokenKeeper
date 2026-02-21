@@ -20,7 +20,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from knowledge_rag.server import _get_lifespan_data, _rebuild_bm25_from_metadata, app_lifespan
+from tokenkeeper.server import _get_lifespan_data, _rebuild_bm25_from_metadata, app_lifespan
 
 
 # ---------------------------------------------------------------------------
@@ -80,12 +80,17 @@ def _run_lifespan(project: Path) -> dict:
     async def _go():
         mock_server = MagicMock()
         with (
-            patch.dict("os.environ", {"KNOWLEDGE_RAG_PROJECT": str(project)}),
-            patch("knowledge_rag.health.run_startup_checks"),
-            patch("knowledge_rag.embeddings.run_smoke_test"),
-            patch("knowledge_rag.embeddings.embed_texts", side_effect=_fake_embed_texts),
+            patch.dict("os.environ", {"TOKENKEEPER_PROJECT": str(project)}),
+            patch("tokenkeeper.health.run_startup_checks"),
+            patch("tokenkeeper.embeddings.run_smoke_test"),
+            patch("tokenkeeper.embeddings.embed_texts", side_effect=_fake_embed_texts),
         ):
             async with app_lifespan(mock_server) as ctx:
+                # Wait for background indexing to complete before exiting
+                for _ in range(200):  # 10s max
+                    if ctx["indexing_state"]["status"] != "indexing":
+                        break
+                    await asyncio.sleep(0.05)
                 return ctx
 
     return asyncio.run(_go())
@@ -93,7 +98,7 @@ def _run_lifespan(project: Path) -> dict:
 
 def _search(lifespan_data: dict, query: str, top_k: int = 10, mode: str | None = None, alpha: float | None = None):
     """Run the search pipeline using lifespan data (same logic as the MCP tool)."""
-    from knowledge_rag.search import search
+    from tokenkeeper.search import search
 
     collection = lifespan_data["collection"]
     bm25_index = lifespan_data["bm25_index"]
@@ -399,7 +404,7 @@ def _run_reindex(
     force: bool = False,
 ):
     """Run the indexing pipeline directly (mirrors reindex_documents tool)."""
-    from knowledge_rag.indexer import index_documents
+    from tokenkeeper.indexer import index_documents
 
     collection = lifespan_data["collection"]
     bm25_index = lifespan_data["bm25_index"]

@@ -1,4 +1,4 @@
-"""Tests for knowledge_rag.discovery module.
+"""Tests for tokenkeeper.discovery module.
 
 Covers: discover_files (generic extension-based discovery), discover_markdown_files
 (recursive walk, exclusion pruning, sorting, case-insensitive .md matching),
@@ -13,8 +13,8 @@ from pathlib import Path
 
 import pytest
 
-from knowledge_rag.config import PathOverride, RagConfig
-from knowledge_rag.discovery import (
+from tokenkeeper.config import PathOverride, RagConfig
+from tokenkeeper.discovery import (
     CODE_EXTENSIONS,
     EXCLUDED_DIRS,
     discover_code_files,

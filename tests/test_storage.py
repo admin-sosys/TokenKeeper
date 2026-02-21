@@ -1,4 +1,4 @@
-"""Comprehensive tests for knowledge_rag.storage module.
+"""Comprehensive tests for tokenkeeper.storage module.
 
 Covers: ChromaDB client creation, collection management, chunk ID generation,
 file chunk replacement with empty-guard, content hashing, stored hash retrieval,
@@ -14,8 +14,8 @@ from pathlib import Path
 import chromadb
 import pytest
 
-from knowledge_rag.ingestion import DocumentChunk
-from knowledge_rag.storage import (
+from tokenkeeper.ingestion import DocumentChunk
+from tokenkeeper.storage import (
     compute_file_hash,
     create_chroma_client,
     file_needs_reindex,

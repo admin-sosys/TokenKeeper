@@ -1,4 +1,4 @@
-"""Startup health checks for Knowledge RAG MCP server.
+"""Startup health checks for TokenKeeper MCP server.
 
 Verifies all runtime prerequisites before the MCP server begins accepting
 requests:
@@ -11,7 +11,7 @@ stderr. All output uses logging or ``file=sys.stderr`` -- never bare
 ``print()`` to stdout -- to avoid corrupting the MCP stdio transport.
 
 Adapted from scripts/health_check.py (Phase 1) to use shared constants
-from knowledge_rag.types instead of hardcoded values.
+from tokenkeeper.types instead of hardcoded values.
 """
 
 from __future__ import annotations
@@ -21,14 +21,14 @@ import shutil
 import sys
 import tempfile
 
-from knowledge_rag.types import (
+from tokenkeeper.types import (
     HealthStatus,
     MODEL_NAME,
     OLLAMA_REQUEST_TIMEOUT,
     OLLAMA_TAGS_URL,
 )
 
-logger = logging.getLogger("knowledge_rag.health")
+logger = logging.getLogger("tokenkeeper.health")
 
 
 # ---------------------------------------------------------------------------
@@ -217,7 +217,7 @@ def run_startup_checks() -> None:
 
     # Report failures to stderr with actionable fixes
     print(
-        "\n=== Knowledge RAG - Startup Health Check FAILED ===\n",
+        "\n=== TokenKeeper - Startup Health Check FAILED ===\n",
         file=sys.stderr,
     )
     for check in checks:

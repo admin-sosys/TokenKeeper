@@ -1,4 +1,4 @@
-"""Comprehensive tests for knowledge_rag.ingestion module.
+"""Comprehensive tests for tokenkeeper.ingestion module.
 
 Covers: DocumentChunk dataclass construction and immutability,
 normalize_whitespace edge cases (CRLF, newline collapsing, space
@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from knowledge_rag.ingestion import (
+from tokenkeeper.ingestion import (
     DocumentChunk,
     HeadingStack,
     chunk_document,
@@ -274,7 +274,7 @@ class TestParseDocument:
             "---\n"
             "Body."
         )
-        with caplog.at_level(logging.WARNING, logger="knowledge_rag.ingestion"):
+        with caplog.at_level(logging.WARNING, logger="tokenkeeper.ingestion"):
             parse_document(text)
         assert any("frontmatter" in msg.lower() for msg in caplog.messages)
 
@@ -346,7 +346,7 @@ class TestChunkDocument:
     def test_oversized_paragraph_logs_warning(self, caplog: pytest.LogCaptureFixture) -> None:
         # Oversized paragraph preceded by a normal one, so the "current is not empty" branch triggers
         body = "Short.\n\n" + "x" * 2000
-        with caplog.at_level(logging.WARNING, logger="knowledge_rag.ingestion"):
+        with caplog.at_level(logging.WARNING, logger="tokenkeeper.ingestion"):
             chunk_document(body, chunk_size=1000)
         assert any("Oversized paragraph" in msg for msg in caplog.messages)
 
@@ -446,7 +446,7 @@ class TestIngestFile:
     def test_non_utf8_logs_warning(self, tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
         md = tmp_path / "bad.md"
         md.write_bytes(b"\x80\x81\x82\x83")
-        with caplog.at_level(logging.WARNING, logger="knowledge_rag.ingestion"):
+        with caplog.at_level(logging.WARNING, logger="tokenkeeper.ingestion"):
             ingest_file(md, tmp_path)
         assert any("non-UTF-8" in msg or "Skipping" in msg for msg in caplog.messages)
 
@@ -508,7 +508,7 @@ class TestIngestFile:
     ) -> None:
         md = tmp_path / "meta_only.md"
         md.write_text("---\ntitle: Only Meta\n---\n   \n\n  ", encoding="utf-8")
-        with caplog.at_level(logging.WARNING, logger="knowledge_rag.ingestion"):
+        with caplog.at_level(logging.WARNING, logger="tokenkeeper.ingestion"):
             result = ingest_file(md, tmp_path)
         assert result == []
         assert any("Empty" in msg or "empty" in msg.lower() for msg in caplog.messages)
@@ -721,7 +721,7 @@ class TestPythonCodeChunking:
 
     def test_single_function(self) -> None:
         code = "def foo():\n    return 42\n"
-        from knowledge_rag.ingestion import chunk_python_code
+        from tokenkeeper.ingestion import chunk_python_code
 
         chunks = chunk_python_code(code)
         assert len(chunks) >= 1
@@ -731,7 +731,7 @@ class TestPythonCodeChunking:
 
     def test_two_functions(self) -> None:
         code = "def foo():\n    return 1\n\ndef bar():\n    return 2\n"
-        from knowledge_rag.ingestion import chunk_python_code
+        from tokenkeeper.ingestion import chunk_python_code
 
         chunks = chunk_python_code(code)
         func_chunks = [c for c in chunks if c[4] == "function"]
@@ -741,7 +741,7 @@ class TestPythonCodeChunking:
 
     def test_class_small(self) -> None:
         code = "class MyClass:\n    def method(self):\n        pass\n"
-        from knowledge_rag.ingestion import chunk_python_code
+        from tokenkeeper.ingestion import chunk_python_code
 
         chunks = chunk_python_code(code, chunk_size=5000)
         class_chunks = [c for c in chunks if c[4] == "class"]
@@ -750,7 +750,7 @@ class TestPythonCodeChunking:
 
     def test_module_level_code(self) -> None:
         code = "import os\nimport sys\n\nX = 42\n\ndef foo():\n    pass\n"
-        from knowledge_rag.ingestion import chunk_python_code
+        from tokenkeeper.ingestion import chunk_python_code
 
         chunks = chunk_python_code(code)
         module_chunks = [c for c in chunks if c[4] == "module"]
@@ -759,7 +759,7 @@ class TestPythonCodeChunking:
 
     def test_async_function(self) -> None:
         code = "async def fetch():\n    return await something()\n"
-        from knowledge_rag.ingestion import chunk_python_code
+        from tokenkeeper.ingestion import chunk_python_code
 
         chunks = chunk_python_code(code)
         func_chunks = [c for c in chunks if c[4] == "function"]
@@ -768,7 +768,7 @@ class TestPythonCodeChunking:
 
     def test_decorated_function(self) -> None:
         code = "@decorator\ndef foo():\n    pass\n"
-        from knowledge_rag.ingestion import chunk_python_code
+        from tokenkeeper.ingestion import chunk_python_code
 
         chunks = chunk_python_code(code)
         func_chunks = [c for c in chunks if c[4] == "function"]
@@ -777,7 +777,7 @@ class TestPythonCodeChunking:
 
     def test_line_numbers(self) -> None:
         code = "import os\n\ndef foo():\n    return 1\n\ndef bar():\n    return 2\n"
-        from knowledge_rag.ingestion import chunk_python_code
+        from tokenkeeper.ingestion import chunk_python_code
 
         chunks = chunk_python_code(code)
         func_chunks = sorted(
@@ -790,7 +790,7 @@ class TestPythonCodeChunking:
 
     def test_syntax_error_fallback(self) -> None:
         code = "def broken(:\n    pass\n"
-        from knowledge_rag.ingestion import chunk_python_code
+        from tokenkeeper.ingestion import chunk_python_code
 
         chunks = chunk_python_code(code)
         assert len(chunks) >= 1
@@ -800,7 +800,7 @@ class TestPythonCodeChunking:
     def test_ingest_code_file_python(self, tmp_path) -> None:
         py_file = tmp_path / "example.py"
         py_file.write_text("def hello():\n    return 'world'\n")
-        from knowledge_rag.ingestion import ingest_code_file
+        from tokenkeeper.ingestion import ingest_code_file
 
         chunks = ingest_code_file(py_file, tmp_path)
         assert len(chunks) >= 1
@@ -809,7 +809,7 @@ class TestPythonCodeChunking:
     def test_ingest_code_file_language_field(self, tmp_path) -> None:
         py_file = tmp_path / "module.py"
         py_file.write_text("X = 1\n\ndef foo():\n    pass\n")
-        from knowledge_rag.ingestion import ingest_code_file
+        from tokenkeeper.ingestion import ingest_code_file
 
         chunks = ingest_code_file(py_file, tmp_path)
         for chunk in chunks:

@@ -13,9 +13,9 @@ from pathlib import Path
 import chromadb
 import pytest
 
-from knowledge_rag.bm25_index import BM25Index
-from knowledge_rag.search import SearchResult, search
-from knowledge_rag.storage import get_or_create_collection
+from tokenkeeper.bm25_index import BM25Index
+from tokenkeeper.search import SearchResult, search
+from tokenkeeper.storage import get_or_create_collection
 
 
 # ---------------------------------------------------------------------------

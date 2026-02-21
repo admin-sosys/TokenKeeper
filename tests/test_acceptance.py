@@ -1,6 +1,6 @@
-"""Acceptance tests for Knowledge RAG against a real codebase.
+"""Acceptance tests for TokenKeeper against a real codebase.
 
-These tests clone a real open-source repository and run the full Knowledge RAG
+These tests clone a real open-source repository and run the full TokenKeeper
 pipeline against it: discovery → ingestion → indexing → search.
 
 Two tiers:
@@ -47,26 +47,26 @@ from typing import Any
 import chromadb
 import pytest
 
-from knowledge_rag.bm25_index import BM25Index
-from knowledge_rag.config import RagConfig
-from knowledge_rag.discovery import (
+from tokenkeeper.bm25_index import BM25Index
+from tokenkeeper.config import RagConfig
+from tokenkeeper.discovery import (
     CODE_EXTENSIONS,
     discover_code_files,
     discover_markdown_files,
 )
-from knowledge_rag.indexer import (
+from tokenkeeper.indexer import (
     IndexingResult,
     _discover_for_mode,
     _ingest_file_routed,
     index_documents,
 )
-from knowledge_rag.ingestion import (
+from tokenkeeper.ingestion import (
     DocumentChunk,
     chunk_document_heading_aware,
     ingest_code_file,
     ingest_file,
 )
-from knowledge_rag.search import SearchResult, enrich_results, search
+from tokenkeeper.search import SearchResult, enrich_results, search
 
 
 # ---------------------------------------------------------------------------
@@ -758,7 +758,7 @@ def real_embed_fn():
     """Return the real Ollama embedding function."""
     if not ollama_available:
         pytest.skip(ollama_reason)
-    from knowledge_rag.embeddings import embed_texts
+    from tokenkeeper.embeddings import embed_texts
     return embed_texts
 
 

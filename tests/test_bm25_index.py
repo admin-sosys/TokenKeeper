@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import pytest
 
-from knowledge_rag.bm25_index import (
+from tokenkeeper.bm25_index import (
     BM25Index,
     tokenize_for_bm25,
     tokens_to_metadata_string,

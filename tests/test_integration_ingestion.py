@@ -15,8 +15,8 @@ from pathlib import Path
 
 import pytest
 
-from knowledge_rag.discovery import discover_markdown_files
-from knowledge_rag.ingestion import DocumentChunk, ingest_file, parse_document
+from tokenkeeper.discovery import discover_markdown_files
+from tokenkeeper.ingestion import DocumentChunk, ingest_file, parse_document
 
 # ---------------------------------------------------------------------------
 # Constants

@@ -1,14 +1,14 @@
-"""Knowledge RAG - Local RAG system as MCP server for Claude Code.
+"""TokenKeeper - Local RAG system as MCP server for Claude Code.
 
 Thin wrapper that delegates to the FastMCP server entry point.
-Prefer ``python -m knowledge_rag`` for production use.
+Prefer ``python -m tokenkeeper`` for production use.
 """
 
-from knowledge_rag.server import mcp
+from tokenkeeper.server import mcp
 
 
 def main() -> None:
-    """Run the Knowledge RAG MCP server."""
+    """Run the TokenKeeper MCP server."""
     mcp.run()
 
 

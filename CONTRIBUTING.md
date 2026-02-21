@@ -43,7 +43,7 @@ uv run pytest tests/ -m "not ollama" -v
 Run tests with **coverage reporting**:
 
 ```bash
-uv run pytest tests/ -m "not ollama" --cov=src/knowledge_rag --cov-report=term-missing
+uv run pytest tests/ -m "not ollama" --cov=src/tokenkeeper --cov-report=term-missing
 ```
 
 ## Code Style

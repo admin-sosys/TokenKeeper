@@ -36,7 +36,7 @@ jobs:
 
       - name: Run tests with coverage
         if: matrix.os == 'ubuntu-latest'
-        run: uv run pytest tests/ -m "not ollama" -v --tb=short --cov=src/knowledge_rag --cov-report=xml --cov-report=term-missing
+        run: uv run pytest tests/ -m "not ollama" -v --tb=short --cov=src/tokenkeeper --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-latest'

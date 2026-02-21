@@ -1,4 +1,4 @@
-"""File watcher for Knowledge RAG.
+"""File watcher for TokenKeeper.
 
 Provides filesystem monitoring with debouncing and git burst detection
 for triggering incremental reindexing.
@@ -20,7 +20,7 @@ from typing import Callable
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
 from watchdog.observers import Observer
 
-logger = logging.getLogger("knowledge_rag.watcher")
+logger = logging.getLogger("tokenkeeper.watcher")
 
 
 class DebounceAccumulator:

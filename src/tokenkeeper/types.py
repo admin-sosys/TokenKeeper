@@ -1,4 +1,4 @@
-"""Shared types, constants, and utilities for Knowledge RAG.
+"""Shared types, constants, and utilities for TokenKeeper.
 
 Provides the canonical HealthStatus type, Ollama connection constants,
 smoke test parameters, and a pure-Python cosine similarity function.

@@ -19,9 +19,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from knowledge_rag.bm25_index import BM25Index
-from knowledge_rag.indexer import IndexingResult, _read_file_with_retry, index_documents
-from knowledge_rag.ingestion import DocumentChunk
+from tokenkeeper.bm25_index import BM25Index
+from tokenkeeper.indexer import IndexingResult, _read_file_with_retry, index_documents
+from tokenkeeper.ingestion import DocumentChunk
 
 
 # ---------------------------------------------------------------------------
@@ -58,12 +58,12 @@ def _make_chunk(
 # ---------------------------------------------------------------------------
 
 
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_no_files_discovered(mock_discover: MagicMock, tmp_path: Path) -> None:
     """No files discovered -> empty result."""
     mock_discover.return_value = []
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -79,8 +79,8 @@ def test_index_no_files_discovered(mock_discover: MagicMock, tmp_path: Path) -> 
     assert result.files_failed == 0
 
 
-@patch("knowledge_rag.indexer.file_needs_reindex")
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.file_needs_reindex")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_all_files_up_to_date(
     mock_discover: MagicMock,
     mock_needs_reindex: MagicMock,
@@ -96,7 +96,7 @@ def test_index_all_files_up_to_date(
     mock_discover.return_value = [f1, f2]
     mock_needs_reindex.return_value = False
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -111,11 +111,11 @@ def test_index_all_files_up_to_date(
     assert result.files_failed == 0
 
 
-@patch("knowledge_rag.indexer.replace_file_chunks")
-@patch("knowledge_rag.indexer.embed_chunks_batched")
-@patch("knowledge_rag.indexer.ingest_file")
-@patch("knowledge_rag.indexer.file_needs_reindex")
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.replace_file_chunks")
+@patch("tokenkeeper.indexer.embed_chunks_batched")
+@patch("tokenkeeper.indexer.ingest_file")
+@patch("tokenkeeper.indexer.file_needs_reindex")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_new_files(
     mock_discover: MagicMock,
     mock_needs_reindex: MagicMock,
@@ -138,7 +138,7 @@ def test_index_new_files(
     mock_ingest.side_effect = [chunks1, chunks2]
     mock_embed_batch.return_value = [[0.1] * 768, [0.2] * 768, [0.3] * 768]
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -153,11 +153,11 @@ def test_index_new_files(
     assert mock_ingest.call_count == 2
 
 
-@patch("knowledge_rag.indexer.replace_file_chunks")
-@patch("knowledge_rag.indexer.embed_chunks_batched")
-@patch("knowledge_rag.indexer.ingest_file")
-@patch("knowledge_rag.indexer.file_needs_reindex")
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.replace_file_chunks")
+@patch("tokenkeeper.indexer.embed_chunks_batched")
+@patch("tokenkeeper.indexer.ingest_file")
+@patch("tokenkeeper.indexer.file_needs_reindex")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_skips_unchanged(
     mock_discover: MagicMock,
     mock_needs_reindex: MagicMock,
@@ -181,7 +181,7 @@ def test_index_skips_unchanged(
     mock_ingest.return_value = chunks
     mock_embed_batch.return_value = [[0.1] * 768]
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -196,8 +196,8 @@ def test_index_skips_unchanged(
     assert result.files_failed == 0
 
 
-@patch("knowledge_rag.indexer.file_needs_reindex")
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.file_needs_reindex")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_handles_permission_error(
     mock_discover: MagicMock,
     mock_needs_reindex: MagicMock,
@@ -221,7 +221,7 @@ def test_index_handles_permission_error(
 
     mock_needs_reindex.return_value = False
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -236,10 +236,10 @@ def test_index_handles_permission_error(
     assert result.files_skipped == 1
 
 
-@patch("knowledge_rag.indexer.embed_chunks_batched")
-@patch("knowledge_rag.indexer.ingest_file")
-@patch("knowledge_rag.indexer.file_needs_reindex")
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.embed_chunks_batched")
+@patch("tokenkeeper.indexer.ingest_file")
+@patch("tokenkeeper.indexer.file_needs_reindex")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_embedding_failure_propagates(
     mock_discover: MagicMock,
     mock_needs_reindex: MagicMock,
@@ -256,7 +256,7 @@ def test_index_embedding_failure_propagates(
     mock_ingest.return_value = [_make_chunk("text", "doc.md", 0, 1)]
     mock_embed_batch.side_effect = RuntimeError("Batch 1 failed after 3 retries")
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -268,11 +268,11 @@ def test_index_embedding_failure_propagates(
         index_documents(tmp_path, config, collection, bm25, _fake_embed_fn)
 
 
-@patch("knowledge_rag.indexer.replace_file_chunks")
-@patch("knowledge_rag.indexer.embed_chunks_batched")
-@patch("knowledge_rag.indexer.ingest_file")
-@patch("knowledge_rag.indexer.file_needs_reindex")
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.replace_file_chunks")
+@patch("tokenkeeper.indexer.embed_chunks_batched")
+@patch("tokenkeeper.indexer.ingest_file")
+@patch("tokenkeeper.indexer.file_needs_reindex")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_bm25_updated(
     mock_discover: MagicMock,
     mock_needs_reindex: MagicMock,
@@ -293,7 +293,7 @@ def test_index_bm25_updated(
     ]
     mock_embed_batch.return_value = [[0.1] * 768, [0.2] * 768]
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -306,11 +306,11 @@ def test_index_bm25_updated(
     assert len(bm25) == 2
 
 
-@patch("knowledge_rag.indexer.replace_file_chunks")
-@patch("knowledge_rag.indexer.embed_chunks_batched")
-@patch("knowledge_rag.indexer.ingest_file")
-@patch("knowledge_rag.indexer.file_needs_reindex")
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.replace_file_chunks")
+@patch("tokenkeeper.indexer.embed_chunks_batched")
+@patch("tokenkeeper.indexer.ingest_file")
+@patch("tokenkeeper.indexer.file_needs_reindex")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_result_statistics(
     mock_discover: MagicMock,
     mock_needs_reindex: MagicMock,
@@ -334,7 +334,7 @@ def test_index_result_statistics(
     ]
     mock_embed_batch.return_value = [[0.1] * 768] * 3
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -362,9 +362,9 @@ def test_index_result_statistics(
 # ---------------------------------------------------------------------------
 
 
-@patch("knowledge_rag.indexer.replace_file_chunks")
-@patch("knowledge_rag.indexer.embed_chunks_batched")
-@patch("knowledge_rag.indexer.ingest_file")
+@patch("tokenkeeper.indexer.replace_file_chunks")
+@patch("tokenkeeper.indexer.embed_chunks_batched")
+@patch("tokenkeeper.indexer.ingest_file")
 def test_index_partial_reindex_uses_target_files(
     mock_ingest: MagicMock,
     mock_embed_batch: MagicMock,
@@ -380,7 +380,7 @@ def test_index_partial_reindex_uses_target_files(
     mock_ingest.return_value = [_make_chunk("target chunk", "target.md", 0, 1)]
     mock_embed_batch.return_value = [[0.1] * 768]
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -400,8 +400,8 @@ def test_index_partial_reindex_uses_target_files(
     assert call_path == f1
 
 
-@patch("knowledge_rag.indexer.file_needs_reindex")
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.file_needs_reindex")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_partial_skips_removed_file_cleanup(
     mock_discover: MagicMock,
     mock_needs_reindex: MagicMock,
@@ -413,7 +413,7 @@ def test_index_partial_skips_removed_file_cleanup(
 
     mock_needs_reindex.return_value = False
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -446,11 +446,11 @@ def test_index_partial_skips_removed_file_cleanup(
 # ---------------------------------------------------------------------------
 
 
-@patch("knowledge_rag.indexer.replace_file_chunks")
-@patch("knowledge_rag.indexer.embed_chunks_batched")
-@patch("knowledge_rag.indexer.ingest_file")
-@patch("knowledge_rag.indexer.file_needs_reindex")
-@patch("knowledge_rag.indexer.discover_markdown_files")
+@patch("tokenkeeper.indexer.replace_file_chunks")
+@patch("tokenkeeper.indexer.embed_chunks_batched")
+@patch("tokenkeeper.indexer.ingest_file")
+@patch("tokenkeeper.indexer.file_needs_reindex")
+@patch("tokenkeeper.indexer.discover_markdown_files")
 def test_index_force_reindexes_unchanged(
     mock_discover: MagicMock,
     mock_needs_reindex: MagicMock,
@@ -469,7 +469,7 @@ def test_index_force_reindexes_unchanged(
     mock_ingest.return_value = [_make_chunk("chunk", "unchanged.md", 0, 1)]
     mock_embed_batch.return_value = [[0.1] * 768]
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -502,7 +502,7 @@ def test_read_file_with_retry_success(tmp_path: Path) -> None:
     assert result == "hello world"
 
 
-@patch("knowledge_rag.indexer.time.sleep")
+@patch("tokenkeeper.indexer.time.sleep")
 def test_read_file_with_retry_permission_error_then_success(
     mock_sleep: MagicMock, tmp_path: Path
 ) -> None:
@@ -529,7 +529,7 @@ def test_read_file_with_retry_permission_error_then_success(
     mock_sleep.assert_called_once_with(0.5)
 
 
-@patch("knowledge_rag.indexer.time.sleep")
+@patch("tokenkeeper.indexer.time.sleep")
 def test_read_file_with_retry_all_fail(
     mock_sleep: MagicMock, tmp_path: Path
 ) -> None:
@@ -568,7 +568,7 @@ def test_index_stores_indexed_at(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.PersistentClient(path=str(tmp_path / "chroma"))
@@ -606,7 +606,7 @@ def test_index_stores_in_chromadb(tmp_path: Path) -> None:
         encoding="utf-8",
     )
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.PersistentClient(path=str(tmp_path / "chroma"))
@@ -630,7 +630,7 @@ def test_index_stores_in_chromadb(tmp_path: Path) -> None:
 # Mode router tests (09-06)
 # ---------------------------------------------------------------------------
 
-from knowledge_rag.indexer import _discover_for_mode, _ingest_file_routed
+from tokenkeeper.indexer import _discover_for_mode, _ingest_file_routed
 
 
 def test_discover_for_mode_docs(tmp_path: Path) -> None:
@@ -711,7 +711,7 @@ def test_index_docs_mode_only_markdown(tmp_path: Path) -> None:
     (tmp_path / "readme.md").write_text("# Hello\n\nWorld.")
     (tmp_path / "main.py").write_text("def foo():\n    pass\n")
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -734,7 +734,7 @@ def test_index_code_mode_only_code(tmp_path: Path) -> None:
     (tmp_path / "readme.md").write_text("# Hello\n\nWorld.")
     (tmp_path / "main.py").write_text("def foo():\n    return 42\n")
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -756,7 +756,7 @@ def test_index_both_mode_all_files(tmp_path: Path) -> None:
     (tmp_path / "readme.md").write_text("# Hello\n\nWorld.")
     (tmp_path / "main.py").write_text("def foo():\n    return 42\n")
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()
@@ -780,7 +780,7 @@ def test_index_stores_heading_hierarchy(tmp_path: Path) -> None:
         "# Config\n\nIntro.\n\n## Database\n\nDB details.\n\n## Cache\n\nCache details."
     )
 
-    from knowledge_rag.config import RagConfig
+    from tokenkeeper.config import RagConfig
     import chromadb
 
     client = chromadb.Client()

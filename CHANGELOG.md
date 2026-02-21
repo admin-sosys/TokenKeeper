@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial release of TokenKeeper (knowledge-rag)
+- Initial release of TokenKeeper (tokenkeeper)
 - Hybrid search: semantic (vector) + keyword (BM25) with Reciprocal Rank Fusion
 - Local-first architecture: Ollama embeddings, ChromaDB persistent storage
 - FastMCP server with 4 tools: search_knowledge, indexing_status, reindex_documents, get_index_stats

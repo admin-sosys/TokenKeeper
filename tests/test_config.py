@@ -1,4 +1,4 @@
-"""Comprehensive tests for knowledge_rag.config module.
+"""Comprehensive tests for tokenkeeper.config module.
 
 Covers: default values, lenient validation, constraint enforcement,
 per-path overrides, JSONC comment stripping, template generation,
@@ -12,7 +12,7 @@ import json
 import pytest
 from pydantic import ValidationError
 
-from knowledge_rag.config import (
+from tokenkeeper.config import (
     PathOverride,
     RagConfig,
     generate_config_template,

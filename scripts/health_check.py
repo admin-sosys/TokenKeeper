@@ -1,4 +1,4 @@
-"""Startup health check script for Knowledge RAG.
+"""Startup health check script for TokenKeeper.
 
 Verifies all platform prerequisites before RAG operations:
   1. Python version is 3.12.x
@@ -272,7 +272,7 @@ def print_health_report(checks: list[HealthStatus]) -> None:
     fix instructions for any failures.
     """
     print()
-    print("=== Knowledge RAG - Health Check ===")
+    print("=== TokenKeeper - Health Check ===")
     print()
 
     for check in checks:

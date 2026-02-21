@@ -1,4 +1,4 @@
-"""Unit tests for knowledge_rag.server module.
+"""Unit tests for tokenkeeper.server module.
 
 Tests cover:
 - FastMCP server instance type and tool registration
@@ -20,7 +20,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from knowledge_rag.server import mcp, setup_logging
+from tokenkeeper.server import mcp, setup_logging
 
 
 # ---------------------------------------------------------------------------
@@ -38,8 +38,8 @@ class TestMCPServer:
         assert isinstance(mcp, FastMCP)
 
     def test_mcp_server_name(self) -> None:
-        """Server is named 'Knowledge RAG'."""
-        assert mcp._mcp_server.name == "Knowledge RAG"
+        """Server is named 'TokenKeeper'."""
+        assert mcp._mcp_server.name == "TokenKeeper"
 
     def test_search_knowledge_tool_registered(self) -> None:
         """The search_knowledge tool is registered."""
@@ -90,13 +90,13 @@ class TestSetupLogging:
     def test_handler_count(self, tmp_path: Path) -> None:
         """Two handlers: RotatingFileHandler and StreamHandler."""
         setup_logging(tmp_path)
-        root = logging.getLogger("knowledge_rag")
+        root = logging.getLogger("tokenkeeper")
         assert len(root.handlers) == 2
 
     def test_no_stdout_handler(self, tmp_path: Path) -> None:
         """No handler writes to stdout (protects MCP stdio transport)."""
         setup_logging(tmp_path)
-        root = logging.getLogger("knowledge_rag")
+        root = logging.getLogger("tokenkeeper")
         for handler in root.handlers:
             if hasattr(handler, "stream"):
                 assert handler.stream is not sys.stdout, (
@@ -106,7 +106,7 @@ class TestSetupLogging:
     def test_stderr_handler_present(self, tmp_path: Path) -> None:
         """A StreamHandler targeting stderr exists."""
         setup_logging(tmp_path)
-        root = logging.getLogger("knowledge_rag")
+        root = logging.getLogger("tokenkeeper")
         stderr_handlers = [
             h
             for h in root.handlers
@@ -119,7 +119,7 @@ class TestSetupLogging:
         from logging.handlers import RotatingFileHandler
 
         setup_logging(tmp_path)
-        root = logging.getLogger("knowledge_rag")
+        root = logging.getLogger("tokenkeeper")
         file_handlers = [
             h for h in root.handlers if isinstance(h, RotatingFileHandler)
         ]
@@ -132,7 +132,7 @@ class TestSetupLogging:
         """Calling setup_logging twice doesn't duplicate handlers."""
         setup_logging(tmp_path)
         setup_logging(tmp_path)
-        root = logging.getLogger("knowledge_rag")
+        root = logging.getLogger("tokenkeeper")
         assert len(root.handlers) == 2
 
 
@@ -143,23 +143,23 @@ class TestSetupLogging:
 
 def _mock_indexing_result():
     """Create a mock IndexingResult for lifespan tests."""
-    from knowledge_rag.indexer import IndexingResult
+    from tokenkeeper.indexer import IndexingResult
     return IndexingResult(files_indexed=0, chunks_indexed=0, files_skipped=0, files_failed=0)
 
 
 class TestLifespanEnvVariable:
-    """Tests for KNOWLEDGE_RAG_PROJECT env var in lifespan."""
+    """Tests for TOKENKEEPER_PROJECT env var in lifespan."""
 
-    @patch("knowledge_rag.health.run_startup_checks")
-    @patch("knowledge_rag.embeddings.run_smoke_test")
+    @patch("tokenkeeper.health.run_startup_checks")
+    @patch("tokenkeeper.embeddings.run_smoke_test")
     def test_uses_cwd_when_env_empty(
         self,
         mock_smoke: MagicMock,
         mock_health: MagicMock,
         tmp_path: Path,
     ) -> None:
-        """When KNOWLEDGE_RAG_PROJECT is empty, falls back to cwd."""
-        from knowledge_rag.server import app_lifespan
+        """When TOKENKEEPER_PROJECT is empty, falls back to cwd."""
+        from tokenkeeper.server import app_lifespan
 
         async def _run() -> dict:
             mock_server = MagicMock()
@@ -168,23 +168,23 @@ class TestLifespanEnvVariable:
 
         # Use patch.dict to merge (not replace) environ
         with (
-            patch.dict("os.environ", {"KNOWLEDGE_RAG_PROJECT": ""}),
-            patch("knowledge_rag.server.Path.cwd", return_value=tmp_path),
+            patch.dict("os.environ", {"TOKENKEEPER_PROJECT": ""}),
+            patch("tokenkeeper.server.Path.cwd", return_value=tmp_path),
         ):
             result = asyncio.run(_run())
 
         assert result["project_root"] == str(tmp_path)
 
-    @patch("knowledge_rag.health.run_startup_checks")
-    @patch("knowledge_rag.embeddings.run_smoke_test")
+    @patch("tokenkeeper.health.run_startup_checks")
+    @patch("tokenkeeper.embeddings.run_smoke_test")
     def test_uses_env_variable(
         self,
         mock_smoke: MagicMock,
         mock_health: MagicMock,
         tmp_path: Path,
     ) -> None:
-        """When KNOWLEDGE_RAG_PROJECT is set, uses that as project root."""
-        from knowledge_rag.server import app_lifespan
+        """When TOKENKEEPER_PROJECT is set, uses that as project root."""
+        from tokenkeeper.server import app_lifespan
 
         async def _run() -> dict:
             mock_server = MagicMock()
@@ -194,13 +194,13 @@ class TestLifespanEnvVariable:
         env_path = str(tmp_path / "custom_project")
         (tmp_path / "custom_project").mkdir()
 
-        with patch.dict("os.environ", {"KNOWLEDGE_RAG_PROJECT": env_path}):
+        with patch.dict("os.environ", {"TOKENKEEPER_PROJECT": env_path}):
             result = asyncio.run(_run())
 
         assert result["project_root"] == env_path
 
-    @patch("knowledge_rag.health.run_startup_checks")
-    @patch("knowledge_rag.embeddings.run_smoke_test")
+    @patch("tokenkeeper.health.run_startup_checks")
+    @patch("tokenkeeper.embeddings.run_smoke_test")
     def test_lifespan_yields_full_context(
         self,
         mock_smoke: MagicMock,
@@ -208,14 +208,19 @@ class TestLifespanEnvVariable:
         tmp_path: Path,
     ) -> None:
         """Lifespan yields dict with all expected keys."""
-        from knowledge_rag.server import app_lifespan
+        from tokenkeeper.server import app_lifespan
 
         async def _run() -> dict:
             mock_server = MagicMock()
             async with app_lifespan(mock_server) as ctx:
+                # Wait for background indexing to complete before exiting
+                for _ in range(200):  # 10s max
+                    if ctx["indexing_state"]["status"] != "indexing":
+                        break
+                    await asyncio.sleep(0.05)
                 return ctx
 
-        with patch.dict("os.environ", {"KNOWLEDGE_RAG_PROJECT": str(tmp_path)}):
+        with patch.dict("os.environ", {"TOKENKEEPER_PROJECT": str(tmp_path)}):
             result = asyncio.run(_run())
 
         # Phase 2 keys
@@ -231,14 +236,14 @@ class TestLifespanEnvVariable:
         assert "indexing_state" in result
         assert result["indexing_state"]["status"] in ("ready", "error")
 
-    @patch("knowledge_rag.health.run_startup_checks", side_effect=SystemExit(1))
+    @patch("tokenkeeper.health.run_startup_checks", side_effect=SystemExit(1))
     def test_health_failure_blocks_startup(
         self,
         mock_health: MagicMock,
         tmp_path: Path,
     ) -> None:
         """Failed health check raises SystemExit(1)."""
-        from knowledge_rag.server import app_lifespan
+        from tokenkeeper.server import app_lifespan
 
         async def _run() -> dict:
             mock_server = MagicMock()
@@ -246,14 +251,14 @@ class TestLifespanEnvVariable:
                 return ctx
 
         with (
-            patch.dict("os.environ", {"KNOWLEDGE_RAG_PROJECT": str(tmp_path)}),
+            patch.dict("os.environ", {"TOKENKEEPER_PROJECT": str(tmp_path)}),
             pytest.raises(SystemExit, match="1"),
         ):
             asyncio.run(_run())
 
-    @patch("knowledge_rag.health.run_startup_checks")
+    @patch("tokenkeeper.health.run_startup_checks")
     @patch(
-        "knowledge_rag.embeddings.run_smoke_test", side_effect=SystemExit(1)
+        "tokenkeeper.embeddings.run_smoke_test", side_effect=SystemExit(1)
     )
     def test_smoke_failure_blocks_startup(
         self,
@@ -262,7 +267,7 @@ class TestLifespanEnvVariable:
         tmp_path: Path,
     ) -> None:
         """Failed smoke test raises SystemExit(1)."""
-        from knowledge_rag.server import app_lifespan
+        from tokenkeeper.server import app_lifespan
 
         async def _run() -> dict:
             mock_server = MagicMock()
@@ -270,7 +275,7 @@ class TestLifespanEnvVariable:
                 return ctx
 
         with (
-            patch.dict("os.environ", {"KNOWLEDGE_RAG_PROJECT": str(tmp_path)}),
+            patch.dict("os.environ", {"TOKENKEEPER_PROJECT": str(tmp_path)}),
             pytest.raises(SystemExit, match="1"),
         ):
             asyncio.run(_run())
@@ -289,9 +294,9 @@ class TestLifespanEnvVariable:
 class TestFileWatcherLifespan:
     """Tests for FileWatcher integration in server lifespan."""
 
-    @patch("knowledge_rag.health.run_startup_checks")
-    @patch("knowledge_rag.embeddings.run_smoke_test")
-    @patch("knowledge_rag.watcher.FileWatcher")
+    @patch("tokenkeeper.health.run_startup_checks")
+    @patch("tokenkeeper.embeddings.run_smoke_test")
+    @patch("tokenkeeper.watcher.FileWatcher")
     def test_watcher_not_started_when_disabled(
         self,
         MockWatcher: MagicMock,
@@ -300,7 +305,7 @@ class TestFileWatcherLifespan:
         tmp_path: Path,
     ) -> None:
         """With watch_enabled=False, FileWatcher is NOT created."""
-        from knowledge_rag.server import app_lifespan
+        from tokenkeeper.server import app_lifespan
 
         # Write a config with watch_enabled=False
         rag_dir = tmp_path / ".rag"
@@ -313,7 +318,7 @@ class TestFileWatcherLifespan:
             async with app_lifespan(mock_server) as ctx:
                 return ctx
 
-        with patch.dict("os.environ", {"KNOWLEDGE_RAG_PROJECT": str(tmp_path)}):
+        with patch.dict("os.environ", {"TOKENKEEPER_PROJECT": str(tmp_path)}):
             result = asyncio.run(_run())
 
         # Watcher should NOT have been instantiated
@@ -321,9 +326,9 @@ class TestFileWatcherLifespan:
         assert "config" in result
         assert "indexing_state" in result
 
-    @patch("knowledge_rag.health.run_startup_checks")
-    @patch("knowledge_rag.embeddings.run_smoke_test")
-    @patch("knowledge_rag.watcher.FileWatcher")
+    @patch("tokenkeeper.health.run_startup_checks")
+    @patch("tokenkeeper.embeddings.run_smoke_test")
+    @patch("tokenkeeper.watcher.FileWatcher")
     def test_watcher_started_when_enabled(
         self,
         MockWatcher: MagicMock,
@@ -332,7 +337,7 @@ class TestFileWatcherLifespan:
         tmp_path: Path,
     ) -> None:
         """With watch_enabled=True, FileWatcher.start() is called."""
-        from knowledge_rag.server import app_lifespan
+        from tokenkeeper.server import app_lifespan
 
         mock_instance = MagicMock()
         MockWatcher.return_value = mock_instance
@@ -342,9 +347,14 @@ class TestFileWatcherLifespan:
             async with app_lifespan(mock_server) as ctx:
                 # Verify watcher was started during lifespan
                 mock_instance.start.assert_called_once()
+                # Wait for background indexing to complete before exiting
+                for _ in range(200):  # 10s max
+                    if ctx["indexing_state"]["status"] != "indexing":
+                        break
+                    await asyncio.sleep(0.05)
                 return ctx
 
-        with patch.dict("os.environ", {"KNOWLEDGE_RAG_PROJECT": str(tmp_path)}):
+        with patch.dict("os.environ", {"TOKENKEEPER_PROJECT": str(tmp_path)}):
             asyncio.run(_run())
 
         # After lifespan exits, watcher.stop() should be called
@@ -352,7 +362,7 @@ class TestFileWatcherLifespan:
 
     def test_make_reindex_callback_skips_when_already_indexing(self) -> None:
         """Callback does nothing when indexing is already in progress."""
-        from knowledge_rag.server import _make_reindex_callback
+        from tokenkeeper.server import _make_reindex_callback
 
         state = {"status": "indexing"}
         loop = MagicMock()
@@ -369,7 +379,7 @@ class TestFileWatcherLifespan:
 
     def test_make_reindex_callback_skips_empty_paths(self) -> None:
         """Callback does nothing when no valid files are passed."""
-        from knowledge_rag.server import _make_reindex_callback
+        from tokenkeeper.server import _make_reindex_callback
 
         state = {"status": "ready"}
         loop = MagicMock()
@@ -388,17 +398,17 @@ class TestImportSpeed:
     """Tests that module import is fast."""
 
     def test_server_import_is_fast(self) -> None:
-        """Importing knowledge_rag.server takes less than 1 second.
+        """Importing tokenkeeper.server takes less than 1 second.
 
         This verifies that heavy dependencies (chromadb, etc.) are lazy-imported
         inside the lifespan, not at module level.
         """
         import importlib
-        import knowledge_rag.server
+        import tokenkeeper.server
 
         # Reload to measure cold import time
         start = time.monotonic()
-        importlib.reload(knowledge_rag.server)
+        importlib.reload(tokenkeeper.server)
         elapsed = time.monotonic() - start
 
         assert elapsed < 1.0, (

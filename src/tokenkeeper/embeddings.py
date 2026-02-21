@@ -23,7 +23,7 @@ from typing import Callable
 
 import requests
 
-from knowledge_rag.types import (
+from tokenkeeper.types import (
     EMBED_MAX_CHARS,
     EXPECTED_EMBEDDING_DIMS,
     GOOGLE_EMBED_MAX_CHARS,
@@ -39,7 +39,7 @@ from knowledge_rag.types import (
     cosine_similarity,
 )
 
-logger = logging.getLogger("knowledge_rag.embeddings")
+logger = logging.getLogger("tokenkeeper.embeddings")
 
 import os as _os
 
@@ -90,11 +90,11 @@ def embed_texts(
     Args:
         texts: Strings to embed.
         timeout: HTTP request timeout in seconds.  Defaults to
-            :data:`knowledge_rag.types.OLLAMA_REQUEST_TIMEOUT`.
+            :data:`tokenkeeper.types.OLLAMA_REQUEST_TIMEOUT`.
 
     Returns:
         A list of embedding vectors (each a list of floats with length
-        :data:`knowledge_rag.types.EXPECTED_EMBEDDING_DIMS`).
+        :data:`tokenkeeper.types.EXPECTED_EMBEDDING_DIMS`).
 
     Raises:
         ConnectionError: If the Ollama server is unreachable.

@@ -21,7 +21,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from knowledge_rag.types import (
+from tokenkeeper.types import (
     EXPECTED_EMBEDDING_DIMS,
     MODEL_NAME,
     SMOKE_TEST_A,
@@ -54,10 +54,10 @@ def _make_response(embeddings: list[list[float]]) -> MagicMock:
 # ---------------------------------------------------------------------------
 
 
-@patch("knowledge_rag.embeddings.requests.post")
+@patch("tokenkeeper.embeddings.requests.post")
 def test_embed_texts_success(mock_post: MagicMock) -> None:
     """embed_texts returns 2 vectors with correct dimensions."""
-    from knowledge_rag.embeddings import embed_texts
+    from tokenkeeper.embeddings import embed_texts
 
     vec_a = _random_vector(1)
     vec_b = _random_vector(2)
@@ -72,10 +72,10 @@ def test_embed_texts_success(mock_post: MagicMock) -> None:
     assert result[1] == vec_b
 
 
-@patch("knowledge_rag.embeddings.requests.post")
+@patch("tokenkeeper.embeddings.requests.post")
 def test_embed_texts_lowercases_input(mock_post: MagicMock) -> None:
     """embed_texts lowercases all input strings before sending to Ollama."""
-    from knowledge_rag.embeddings import embed_texts
+    from tokenkeeper.embeddings import embed_texts
 
     vec = _random_vector(1)
     mock_post.return_value = _make_response([vec])
@@ -89,12 +89,12 @@ def test_embed_texts_lowercases_input(mock_post: MagicMock) -> None:
     assert payload["model"] == MODEL_NAME
 
 
-@patch("knowledge_rag.embeddings.requests.post")
+@patch("tokenkeeper.embeddings.requests.post")
 def test_embed_texts_connection_error(mock_post: MagicMock) -> None:
     """embed_texts raises ConnectionError when Ollama is unreachable."""
     import requests as real_requests
 
-    from knowledge_rag.embeddings import embed_texts
+    from tokenkeeper.embeddings import embed_texts
 
     mock_post.side_effect = real_requests.ConnectionError("refused")
 
@@ -102,10 +102,10 @@ def test_embed_texts_connection_error(mock_post: MagicMock) -> None:
         embed_texts(["test"])
 
 
-@patch("knowledge_rag.embeddings.requests.post")
+@patch("tokenkeeper.embeddings.requests.post")
 def test_embed_texts_wrong_dimensions(mock_post: MagicMock) -> None:
     """embed_texts raises ValueError when vector dims != EXPECTED_EMBEDDING_DIMS."""
-    from knowledge_rag.embeddings import embed_texts
+    from tokenkeeper.embeddings import embed_texts
 
     bad_vec = [0.1] * 512  # Wrong: 512 instead of 768
     mock_post.return_value = _make_response([bad_vec])
@@ -119,10 +119,10 @@ def test_embed_texts_wrong_dimensions(mock_post: MagicMock) -> None:
 # ---------------------------------------------------------------------------
 
 
-@patch("knowledge_rag.embeddings.requests.post")
+@patch("tokenkeeper.embeddings.requests.post")
 def test_smoke_test_pass(mock_post: MagicMock) -> None:
     """run_smoke_test succeeds when vectors are distinct (low similarity)."""
-    from knowledge_rag.embeddings import run_smoke_test
+    from tokenkeeper.embeddings import run_smoke_test
 
     # Two clearly different vectors -> cosine similarity well below 0.99
     vec_a = _random_vector(100)
@@ -138,12 +138,12 @@ def test_smoke_test_pass(mock_post: MagicMock) -> None:
     assert payload["input"] == [SMOKE_TEST_A.lower(), SMOKE_TEST_B.lower()]
 
 
-@patch("knowledge_rag.embeddings.requests.post")
+@patch("tokenkeeper.embeddings.requests.post")
 def test_smoke_test_fail_identical_vectors(
     mock_post: MagicMock, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """run_smoke_test exits with code 1 when vectors are identical (regression)."""
-    from knowledge_rag.embeddings import run_smoke_test
+    from tokenkeeper.embeddings import run_smoke_test
 
     # Same vector for both -> cosine similarity = 1.0
     identical = _random_vector(42)
@@ -160,14 +160,14 @@ def test_smoke_test_fail_identical_vectors(
     assert "uppercase embedding regression" in captured.err.lower() or "FAILED" in captured.err
 
 
-@patch("knowledge_rag.embeddings.requests.post")
+@patch("tokenkeeper.embeddings.requests.post")
 def test_smoke_test_fail_ollama_down(
     mock_post: MagicMock, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """run_smoke_test exits with code 1 when Ollama is unreachable."""
     import requests as real_requests
 
-    from knowledge_rag.embeddings import run_smoke_test
+    from tokenkeeper.embeddings import run_smoke_test
 
     mock_post.side_effect = real_requests.ConnectionError("Connection refused")
 
@@ -190,10 +190,10 @@ def _fake_embed_fn(texts: list[str]) -> list[list[float]]:
     return [[0.1] * 768 for _ in texts]
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_single_batch(mock_sleep: MagicMock) -> None:
     """10 texts with batch_size=15 -> single call to embed_fn."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     calls: list[list[str]] = []
 
@@ -210,10 +210,10 @@ def test_batch_single_batch(mock_sleep: MagicMock) -> None:
     assert all(len(v) == 768 for v in result)
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_multiple_batches(mock_sleep: MagicMock) -> None:
     """35 texts with batch_size=15 -> 3 calls (15, 15, 5)."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     calls: list[list[str]] = []
 
@@ -231,10 +231,10 @@ def test_batch_multiple_batches(mock_sleep: MagicMock) -> None:
     assert len(result) == 35
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_preserves_order(mock_sleep: MagicMock) -> None:
     """Embeddings returned in same order as input texts."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     def order_fn(texts: list[str]) -> list[list[float]]:
         # Return unique vectors based on text index
@@ -248,10 +248,10 @@ def test_batch_preserves_order(mock_sleep: MagicMock) -> None:
         assert result[i][0] == float(i), f"Embedding {i} out of order"
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_empty_input(mock_sleep: MagicMock) -> None:
     """0 texts -> 0 embeddings, no calls to embed_fn."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     calls: list[list[str]] = []
 
@@ -265,10 +265,10 @@ def test_batch_empty_input(mock_sleep: MagicMock) -> None:
     assert len(calls) == 0
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_retry_success(mock_sleep: MagicMock) -> None:
     """embed_fn fails once, succeeds on retry -> returns embeddings."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     call_count = 0
 
@@ -286,10 +286,10 @@ def test_batch_retry_success(mock_sleep: MagicMock) -> None:
     assert call_count == 2  # 1 fail + 1 success
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_retry_exhausted_raises(mock_sleep: MagicMock) -> None:
     """embed_fn always fails -> RuntimeError after all attempts."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     call_count = 0
 
@@ -306,10 +306,10 @@ def test_batch_retry_exhausted_raises(mock_sleep: MagicMock) -> None:
     assert call_count == 4
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_abort_on_failure(mock_sleep: MagicMock) -> None:
     """embed_fn fails on 2nd batch after retries -> RuntimeError."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     batch_num = 0
 
@@ -330,10 +330,10 @@ def test_batch_abort_on_failure(mock_sleep: MagicMock) -> None:
         embed_chunks_batched(texts, fail_second_batch, batch_size=5, max_retries=3)
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_progress_callback(mock_sleep: MagicMock) -> None:
     """Callback called with (done, total) after each batch."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     progress: list[tuple[int, int]] = []
 
@@ -348,10 +348,10 @@ def test_batch_progress_callback(mock_sleep: MagicMock) -> None:
     assert progress == [(15, 35), (30, 35), (35, 35)]
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_progress_callback_none(mock_sleep: MagicMock) -> None:
     """No callback provided -> no error."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     texts = [f"text_{i}" for i in range(5)]
     # Should not raise even without callback
@@ -360,10 +360,10 @@ def test_batch_progress_callback_none(mock_sleep: MagicMock) -> None:
     assert len(result) == 5
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_custom_batch_size(mock_sleep: MagicMock) -> None:
     """batch_size=5 with 12 texts -> 3 calls (5, 5, 2)."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     calls: list[list[str]] = []
 
@@ -381,10 +381,10 @@ def test_batch_custom_batch_size(mock_sleep: MagicMock) -> None:
     assert len(result) == 12
 
 
-@patch("knowledge_rag.embeddings.time.sleep")
+@patch("tokenkeeper.embeddings.time.sleep")
 def test_batch_backoff_timing(mock_sleep: MagicMock) -> None:
     """Mock time.sleep, verify exponential delays on retries."""
-    from knowledge_rag.embeddings import embed_chunks_batched
+    from tokenkeeper.embeddings import embed_chunks_batched
 
     call_count = 0
 

@@ -1,4 +1,4 @@
-"""Tests for knowledge_rag.watcher module.
+"""Tests for tokenkeeper.watcher module.
 
 Covers: DebounceAccumulator debounce timing, timer reset behaviour,
 independent path tracking, sorted output, clear, and thread safety.
@@ -15,7 +15,7 @@ from unittest.mock import MagicMock
 import pytest
 from watchdog.events import DirCreatedEvent, FileCreatedEvent, FileModifiedEvent
 
-from knowledge_rag.watcher import (
+from tokenkeeper.watcher import (
     BurstDetector,
     DebounceAccumulator,
     FileWatcher,

@@ -1,4 +1,4 @@
-"""Indexing orchestrator for Knowledge RAG.
+"""Indexing orchestrator for TokenKeeper.
 
 Ties together file discovery, document ingestion, batch embedding, ChromaDB
 storage, and BM25 index updates into a single ``index_documents()`` pipeline.
@@ -20,18 +20,18 @@ from typing import Callable
 
 import chromadb
 
-from knowledge_rag.bm25_index import BM25Index, tokenize_for_bm25, tokens_to_metadata_string
-from knowledge_rag.config import RagConfig
-from knowledge_rag.discovery import CODE_EXTENSIONS, discover_code_files, discover_markdown_files
-from knowledge_rag.embeddings import embed_chunks_batched
-from knowledge_rag.ingestion import (
+from tokenkeeper.bm25_index import BM25Index, tokenize_for_bm25, tokens_to_metadata_string
+from tokenkeeper.config import RagConfig
+from tokenkeeper.discovery import CODE_EXTENSIONS, discover_code_files, discover_markdown_files
+from tokenkeeper.embeddings import embed_chunks_batched
+from tokenkeeper.ingestion import (
     DocumentChunk,
     chunk_document_heading_aware,
     ingest_code_file,
     ingest_file,
     normalize_whitespace,
 )
-from knowledge_rag.storage import (
+from tokenkeeper.storage import (
     compute_file_hash,
     file_needs_reindex,
     get_chunk_ids_for_file,
@@ -39,7 +39,7 @@ from knowledge_rag.storage import (
     replace_file_chunks,
 )
 
-logger = logging.getLogger("knowledge_rag.indexer")
+logger = logging.getLogger("tokenkeeper.indexer")
 
 
 # ---------------------------------------------------------------------------

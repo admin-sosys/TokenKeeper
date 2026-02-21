@@ -16,7 +16,7 @@ import logging
 
 from rank_bm25 import BM25Okapi
 
-logger = logging.getLogger("knowledge_rag.bm25_index")
+logger = logging.getLogger("tokenkeeper.bm25_index")
 
 
 # ---------------------------------------------------------------------------

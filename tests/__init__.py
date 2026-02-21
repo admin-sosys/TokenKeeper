@@ -1,1 +1,1 @@
-# Tests package for Knowledge RAG.
+# Tests package for TokenKeeper.
