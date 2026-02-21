@@ -4,6 +4,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![codecov](https://codecov.io/gh/admin-sosys/TokenKeeper/branch/master/graph/badge.svg)](https://codecov.io/gh/admin-sosys/TokenKeeper)
 
+<!-- MCP Install Badges -->
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_MCP_Server-0078d4?style=flat-square&logo=visual-studio-code&logoColor=white)](https://insiders.vscode.dev/redirect?url=vscode%3A%2F%2Fsettings%2FTokenKeeper)
+[![Install in Cursor](https://img.shields.io/badge/Cursor-Install_MCP_Server-000000?style=flat-square&logo=cursor&logoColor=white)](https://cursor.sh)
+
 # TokenKeeper
 
 **Local RAG memory for Claude Code.** Reduce prompt token consumption by ~80% on knowledge-heavy projects.
