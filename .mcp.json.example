@@ -1,8 +1,7 @@
 {
   "mcpServers": {
     "tokenkeeper": {
-      "command": "/path/to/TokenKeeper/.venv/bin/python",
-      "args": ["-m", "tokenkeeper"],
+      "command": "tokenkeeper",
       "env": {
         "TOKENKEEPER_PROJECT": "${workspaceFolder}"
       }

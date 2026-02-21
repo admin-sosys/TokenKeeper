@@ -1,3 +1,4 @@
+[![PyPI](https://img.shields.io/pypi/v/tokenkeeper.svg)](https://pypi.org/project/tokenkeeper/)
 [![CI](https://github.com/admin-sosys/TokenKeeper/actions/workflows/ci.yml/badge.svg)](https://github.com/admin-sosys/TokenKeeper/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -44,24 +45,15 @@ Claude Code agent --> search_knowledge("topic") --> Top-k relevant chunks
 
 ## Quick Start
 
-> **Package name**: TokenKeeper is the project brand name. The PyPI package is `tokenkeeper`:
-> ```bash
-> pip install tokenkeeper
-> ```
-> Until published to PyPI, install from source with `uv sync`.
-
 ### Prerequisites
 
 - Python 3.10+
 - [Ollama](https://ollama.com/) installed and running
-- [uv](https://docs.astral.sh/uv/) (Python package manager)
 
 ### Install
 
 ```bash
-git clone https://github.com/admin-sosys/TokenKeeper.git
-cd TokenKeeper
-uv sync
+pip install tokenkeeper
 ollama pull nomic-embed-text
 ```
 
@@ -73,8 +65,7 @@ Create `.mcp.json` in your project root:
 {
   "mcpServers": {
     "tokenkeeper": {
-      "command": "/path/to/TokenKeeper/.venv/bin/python",
-      "args": ["-m", "tokenkeeper"],
+      "command": "tokenkeeper",
       "env": {
         "TOKENKEEPER_PROJECT": "${workspaceFolder}"
       }
@@ -82,8 +73,6 @@ Create `.mcp.json` in your project root:
   }
 }
 ```
-
-> **Windows**: Use `.venv\Scripts\python.exe` instead of `.venv/bin/python`
 
 Start (or restart) Claude Code in that project. TokenKeeper will:
 
@@ -220,7 +209,7 @@ uv run pytest tests/test_agent_comparison.py -v -s
 |-------|-----|
 | "Ollama connection refused" | Run `ollama serve` to start the server |
 | "nomic-embed-text not found" | Run `ollama pull nomic-embed-text` |
-| Claude Code doesn't show RAG tools | Ensure `.mcp.json` is in project root, restart Claude Code |
+| Claude Code doesn't show RAG tools | Ensure `.mcp.json` is in project root, run `tokenkeeper --help` to verify install, restart Claude Code |
 | 0 chunks indexed | Check `TOKENKEEPER_PROJECT` env var points to your project root |
 | Slow first index | Normal — subsequent starts load cached ChromaDB in ~5 seconds |
 | Search returns irrelevant results | Try `mode: "keyword"` or lower `alpha` to 0.3 |

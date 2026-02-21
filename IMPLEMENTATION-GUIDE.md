@@ -20,7 +20,7 @@ TokenKeeper replaces "load everything" with "query for what's relevant." Instead
 
 ## Prerequisites
 
-1. **Python 3.12+** installed
+1. **Python 3.10+** installed
 2. **Ollama** running locally with `nomic-embed-text` model pulled
 
    ```bash
@@ -29,12 +29,10 @@ TokenKeeper replaces "load everything" with "query for what's relevant." Instead
 
    **OR** a Google Generative AI API key for Gemini embeddings (higher quality, no local GPU needed).
 
-3. **TokenKeeper** cloned and dependencies installed:
+3. **TokenKeeper** installed:
 
    ```bash
-   git clone <your-tokenkeeper-repo>
-   cd TokenKeeper
-   uv sync
+   pip install tokenkeeper
    ```
 
 ---
@@ -49,8 +47,7 @@ Create `.mcp.json` in your project root:
 {
   "mcpServers": {
     "tokenkeeper": {
-      "command": "/path/to/TokenKeeper/.venv/bin/python",
-      "args": ["-m", "tokenkeeper"],
+      "command": "tokenkeeper",
       "env": {
         "TOKENKEEPER_PROJECT": "${workspaceFolder}"
       }
@@ -58,8 +55,6 @@ Create `.mcp.json` in your project root:
   }
 }
 ```
-
-> **Linux/Mac**: Replace the python path with your TokenKeeper venv's python binary, e.g., `~/.local/share/TokenKeeper/.venv/bin/python`.
 
 ### Option B: Global (All Projects)
 

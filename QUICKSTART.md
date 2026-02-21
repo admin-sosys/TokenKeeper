@@ -6,9 +6,10 @@ How to add TokenKeeper to any project, toggle it on/off for A/B testing, and ver
 
 ## New Project Setup (From Scratch)
 
-### 1. Make sure Ollama is running
+### 1. Install TokenKeeper and Ollama
 
 ```bash
+pip install tokenkeeper
 ollama serve
 ollama pull nomic-embed-text
 ```
@@ -21,8 +22,7 @@ Create this file at the root of whatever project you want to index:
 {
   "mcpServers": {
     "tokenkeeper": {
-      "command": "/path/to/TokenKeeper/.venv/bin/python",
-      "args": ["-m", "tokenkeeper"],
+      "command": "tokenkeeper",
       "env": {
         "TOKENKEEPER_PROJECT": "${workspaceFolder}"
       }
@@ -30,9 +30,6 @@ Create this file at the root of whatever project you want to index:
   }
 }
 ```
-
-> **Windows**: Use `.venv\Scripts\python.exe` (e.g., `C:\\path\\to\\TokenKeeper\\.venv\\Scripts\\python.exe`)
-> **Linux/Mac**: Use `.venv/bin/python` (e.g., `/home/user/TokenKeeper/.venv/bin/python`)
 
 That's it. Next time you open Claude Code in that directory, it will:
 
@@ -282,10 +279,12 @@ Check:
 
 ### Full benchmark
 
-Run the test suite from the TokenKeeper directory:
+Clone the repo and run the test suite:
 
 ```bash
-cd /path/to/TokenKeeper
+git clone https://github.com/admin-sosys/TokenKeeper.git
+cd TokenKeeper
+uv sync
 export GOOGLE_API_KEY=your-key  # only if using Gemini embeddings
 
 # Practical A/B token savings test
@@ -294,7 +293,7 @@ uv run pytest tests/test_practical_token_savings.py -v -s
 # Full agent comparison (RAG vs raw grep)
 uv run pytest tests/test_agent_comparison.py -v -s
 
-# Full regression (527 tests)
+# Full regression
 uv run pytest tests/ -v --tb=short
 ```
 
@@ -306,7 +305,7 @@ uv run pytest tests/ -v --tb=short
 
 - Check `.mcp.json` is in the project root (not a subdirectory)
 - Restart Claude Code (`/exit` then reopen)
-- Check the python path in `.mcp.json` points to TokenKeeper's venv
+- Run `tokenkeeper --help` in your terminal to verify it's installed and on your PATH
 
 ### "Ollama connection refused"
 
