@@ -39,9 +39,15 @@ Claude Code agent --> search_knowledge("topic") --> Top-k relevant chunks
 
 ## Quick Start
 
+> **Package name**: TokenKeeper is the project brand name. The PyPI package is `knowledge-rag`:
+> ```bash
+> pip install knowledge-rag
+> ```
+> Until published to PyPI, install from source with `uv sync`.
+
 ### Prerequisites
 
-- Python 3.12+
+- Python 3.10+
 - [Ollama](https://ollama.com/) installed and running
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 
@@ -155,7 +161,7 @@ TokenKeeper/
     health.py          # Startup health checks
 ```
 
-**Stack**: Python 3.12 + FastMCP + ChromaDB 1.5.0 + Ollama + BM25
+**Stack**: Python 3.10+ | FastMCP | ChromaDB 1.5.0 | Ollama | BM25
 
 ## Embedding Providers
 
