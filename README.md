@@ -1,3 +1,8 @@
+[![CI](https://github.com/admin-sosys/TokenKeeper/actions/workflows/ci.yml/badge.svg)](https://github.com/admin-sosys/TokenKeeper/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![codecov](https://codecov.io/gh/admin-sosys/TokenKeeper/branch/master/graph/badge.svg)](https://codecov.io/gh/admin-sosys/TokenKeeper)
+
 # TokenKeeper
 
 **Local RAG memory for Claude Code.** Reduce prompt token consumption by ~80% on knowledge-heavy projects.
